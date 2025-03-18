@@ -1,0 +1,84 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [
+      "node_modules",
+      ".next",
+      ".turbo",
+      "dist"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "lineWidth": 80
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "useSimplifiedLogicExpression": "warn",
+        "noStaticOnlyClass": "off"
+      },
+      "nursery": {
+        "noImgElement": "warn",
+        "noHeadElement": "warn",
+        "noIrregularWhitespace": "error",
+        "noProcessEnv": "info",
+        "useCollapsedIf": "warn",
+        "useValidAutocomplete": "error"
+      },
+      "performance": {
+        "noBarrelFile": "error",
+        "noReExportAll": "info",
+        "useTopLevelRegex": "error"
+      },
+      "style": {
+        "noNegationElse": "warn",
+        "useShorthandArrayType": "warn",
+        "useThrowNewError": "error",
+        "useThrowOnlyError": "error",
+        "useImportType": "error",
+        "useExportType": "error"
+      },
+      "suspicious": {
+        "useAwait": "off"
+      },
+      "correctness": {
+        "noUnusedImports": "error"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "useKeyWithMouseEvents": "off",
+        "noSvgWithoutTitle": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      }
+    },
+    "ignore": [
+      "*-map.ts",
+      "env.ts"
+    ]
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "bracketSpacing": true,
+      "arrowParentheses": "asNeeded",
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "trailingCommas": "all",
+      "lineWidth": 80,
+      "lineEnding": "lf",
+      "attributePosition": "auto",
+      "jsxQuoteStyle": "double",
+      "semicolons": "always"
+    }
+  }
+}
