@@ -18,9 +18,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (!(authToken || publicRoute)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/sign-in';
-    return NextResponse.redirect(redirectUrl);
+    return NextResponse.redirect(new URL('/sign-in', request.nextUrl));
   }
 
   if (
@@ -28,9 +26,7 @@ export function middleware(request: NextRequest) {
     publicRoute &&
     publicRoute.whenAuthenticated === 'redirect'
   ) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/';
-    return NextResponse.redirect(redirectUrl);
+    return NextResponse.redirect(new URL('/', request.nextUrl));
   }
 
   if (authToken && !publicRoute) {

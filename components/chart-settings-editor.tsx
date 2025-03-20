@@ -10,7 +10,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { boardStatuses, presetedTeams } from '@/lib/config';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 import { CopyIcon, DownloadIcon } from 'lucide-react';
 import {
   type ComponentProps,
@@ -157,7 +157,7 @@ function ChartSettings({ customSettings, formAction }: ChartSettingsProps) {
           </div>
         </div>
       </form>
-      <SheetFooter>
+      <SheetFooter className="px-0">
         <SheetClose asChild>
           <Button type="submit">Apply Settings</Button>
         </SheetClose>
@@ -180,9 +180,9 @@ function ExportSettings({ chartRef }: ExportSettingsProps) {
     }
 
     try {
-      toast.info('Preparing chart for export', {
-        description: 'Converting chart to image...',
-      });
+      // toast.info('Preparing chart for export', {
+      //   description: 'Converting chart to image...',
+      // });
 
       const canvas = await html2canvas(chartRef.current);
 
@@ -197,6 +197,7 @@ function ExportSettings({ chartRef }: ExportSettingsProps) {
           'The chart image has been copied to your clipboard. You can now paste it into your Google Presentation.',
       });
     } catch (error) {
+      console.error(error);
       toast.error('Export failed', {
         description: 'An error occurred while exporting the chart',
       });
@@ -212,9 +213,9 @@ function ExportSettings({ chartRef }: ExportSettingsProps) {
     }
 
     try {
-      toast.info('Preparing chart for export', {
-        description: 'Converting chart to image...',
-      });
+      // toast.info('Preparing chart for export', {
+      //   description: 'Converting chart to image...',
+      // });
 
       const canvas = await html2canvas(chartRef.current);
 
@@ -311,7 +312,7 @@ export function ChartSettingsEditor({
         </SheetHeader>
 
         <Tabs
-          className="w-full px-3"
+          className="w-full p-4"
           defaultValue="settings"
           value={activeTab}
           onValueChange={setActiveTab}

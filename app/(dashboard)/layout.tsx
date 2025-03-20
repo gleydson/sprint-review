@@ -3,11 +3,17 @@ import type { ReactNode } from 'react';
 
 import './theme.css';
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default async function DashboardLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <div className="flex flex-1 flex-col">
       <SiteHeader />
-      <main className="flex flex-1 flex-col p-4">{children}</main>
+      <main className="flex flex-1 flex-col p-4 container mx-auto">
+        {children}
+      </main>
     </div>
   );
 }

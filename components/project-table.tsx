@@ -1,6 +1,6 @@
 'use client';
 
-import type { Project } from '@/lib/entities';
+import type { Project } from '@/lib/definitions';
 import {
   type ColumnDef,
   getCoreRowModel,

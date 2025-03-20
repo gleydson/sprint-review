@@ -1,12 +1,14 @@
 export const boardStatuses = [
-  'sprint backlog',
+  'backlog',
   'dev',
   'code review',
   'homolog',
-  'cancelado',
+  'cancelled',
   'deploy',
   'done',
-];
+] as const;
+
+export type BoardStatus = (typeof boardStatuses)[number];
 
 export const taskTypes = [
   'Story',

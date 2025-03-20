@@ -17,13 +17,18 @@ import {
 } from './ui/chart';
 
 export type BarChartData = {
-  [key: string]: number | string;
+  [key: string]: unknown;
 };
+
+type BarChartDataKeys<T extends BarChartData> = keyof T extends string
+  ? keyof T
+  : string;
 
 export type BarChartConfig = ChartConfig;
 
-type BarChartProps = {
-  data: BarChartData[];
+type BarChartProps<T extends BarChartData> = {
+  data: T[];
+  xAxisKey: BarChartDataKeys<T>;
   config?: BarChartConfig;
   type?: 'stacked' | 'grouped';
   showLegend?: boolean;
@@ -33,8 +38,9 @@ type BarChartProps = {
   showYAxis?: boolean;
 };
 
-export function BarChart({
+export function BarChart<T extends BarChartData>({
   data,
+  xAxisKey,
   config = {},
   type = 'grouped',
   showLegend = true,
@@ -42,13 +48,11 @@ export function BarChart({
   showGrid = true,
   showXAxis = true,
   showYAxis = true,
-}: BarChartProps) {
+}: BarChartProps<T>) {
   const xFields = useMemo(
     () =>
-      data && data.length > 0
-        ? Object.keys(data[0]).filter(key => typeof data[0][key] === 'number')
-        : [],
-    [data],
+      data.length ? Object.keys(data[0]).filter(key => key !== xAxisKey) : [],
+    [data, xAxisKey],
   );
 
   const maxTotal = useMemo(
@@ -70,14 +74,6 @@ export function BarChart({
     [data, type, xFields],
   );
 
-  const barKey = useMemo(
-    () =>
-      data && data.length > 0
-        ? Object.keys(data[0]).find(key => typeof data[0][key] === 'string')
-        : '',
-    [data],
-  );
-
   return (
     <ChartContainer config={config}>
       <RechartsBarChart accessibilityLayer data={data}>
@@ -87,7 +83,7 @@ export function BarChart({
         ) : null}
         {showXAxis ? (
           <XAxis
-            dataKey={barKey}
+            dataKey={xAxisKey}
             tickLine={false}
             tickMargin={10}
             axisLine={false}
@@ -110,7 +106,7 @@ export function BarChart({
             key={field}
             dataKey={field}
             stackId={type === 'stacked' ? 'a' : undefined}
-            fill={config[field]?.color ?? `hsl(var(--chart-${idx + 1}))`}
+            fill={config[field]?.color ?? `var(--chart-${idx + 1})`}
           >
             {data.map((entry, index) => {
               const value = entry[field] as number;

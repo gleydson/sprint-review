@@ -1,4 +1,8 @@
+import { getIssuesForSprint } from '@/actions/issues';
+import { fetchSprint } from '@/actions/sprints';
 import { AddedVsPlanned } from '@/components/added-vs-planned';
+import { AverageOpenTime } from '@/components/average-open-time';
+import { ResolvedIssues } from '@/components/resolved-issues';
 import { TotalsByStatus } from '@/components/totals-by-status';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,28 +15,25 @@ import {
 } from '@/components/ui/card';
 import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
 
-const JIRA_API_KEY =
-  'ATATT3xFfGF0px3I00MLX_0c-BY-DqGcFNeWuKdFRWMweMAJYaam7p9DgJtjXNvif_sTeRRofoM7MMMRxajUNxmKPjLmfqLT_2gxeL9OKRuwiX0GewUeiUDjr-5DCeNooWU02ljy79A_k7QbVOD0GGXQ23JV5UQYKOOeY5Jmk5gF4hDWWIaFUCE=05255D94';
-const EMAIL = 'gleydson.rodrigues@stone.com.br';
-
 export default async function Dashboard({
-  params,
+  searchParams,
 }: {
-  params: Promise<{
-    'project-key'?: string;
-    'sprint-id'?: string;
+  searchParams: Promise<{
+    sprintId: string;
   }>;
 }) {
-  const { 'project-key': projectKey, 'sprint-id': sprintId } = await params;
+  const { sprintId } = await searchParams;
 
-  console.log({
-    projectKey,
-    sprintId,
-  });
+  if (!sprintId) {
+    return 'select a project, board and sprint to view charts';
+  }
+
+  const sprint = await fetchSprint(sprintId);
+  const paginatedIssued = await getIssuesForSprint({ sprintId });
 
   return (
-    <div>
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid grid-cols-1 gap-4             md:grid-cols-2 lg:grid-cols-4">
+    <div className="flex flex-col gap-6 my-10">
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="@container/card">
           <CardHeader>
             <CardDescription>Total Revenue</CardDescription>
@@ -123,9 +124,11 @@ export default async function Dashboard({
         </Card>
       </div>
 
-      <div className="grid grid-cols-2">
-        <TotalsByStatus data={[]} config={{}} />
-        <AddedVsPlanned />
+      <div className="grid grid-cols-2 gap-6">
+        <TotalsByStatus issues={paginatedIssued.issues} />
+        <AddedVsPlanned issues={paginatedIssued.issues} sprint={sprint} />
+        <AverageOpenTime issues={paginatedIssued.issues} sprint={sprint} />
+        <ResolvedIssues issues={paginatedIssued.issues} sprint={sprint} />
       </div>
     </div>
   );
