@@ -1,0 +1,34 @@
+{
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/page.tsx": "${dirname}.${extname}",
+    "**/app/**/layout.tsx": "${dirname(1)}/layout.${extname}",
+  },
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    // useRouter should be imported from `next/navigation`
+    "next/router.d.ts",
+    "next/dist/client/router.d.ts",
+    // import ui components from shadcn components folder instead @radix-ui 
+    "@radix-ui/react-avatar/dist/index.d.mts",
+    "@radix-ui/react-dialog/dist/index.d.mts",
+    "@radix-ui/react-context-menu/dist/index.d.mts",
+    "@radix-ui/react-dropdown-menu/dist/index.d.mts",
+    "@radix-ui/react-label/dist/index.d.mts",
+    "@radix-ui/react-popover/dist/index.d.mts",
+    "@radix-ui/react-scroll-area/dist/index.d.mts",
+    "@radix-ui/react-select/dist/index.d.mts",
+    "@radix-ui/react-separator/dist/index.d.mts",
+    "@radix-ui/react-tabs/dist/index.d.mts",
+    "@radix-ui/react-toggle-group/dist/index.d.mts",
+    "@radix-ui/react-toggle/dist/index.d.mts",
+    "@radix-ui/react-tooltip/dist/index.d.mts",
+    "@radix-ui/react-navigation-menu/dist/index.d.mts",
+    "cmdk/dist/index.d.ts",
+  ],
+}
