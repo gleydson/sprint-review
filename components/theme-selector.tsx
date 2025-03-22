@@ -18,16 +18,52 @@ const DEFAULT_THEMES = [
     value: 'default',
   },
   {
-    name: 'Blue',
-    value: 'blue',
+    name: 'Neo brutalism',
+    value: 'neo-brutalistm',
   },
   {
-    name: 'Green',
-    value: 'green',
+    name: 'Candyland',
+    value: 'candyland',
   },
   {
-    name: 'Amber',
-    value: 'amber',
+    name: 'Claymorphism',
+    value: 'claymorphism',
+  },
+  {
+    name: 'Cyberpunk',
+    value: 'cyberpunk',
+  },
+  {
+    name: 'Elegant luxury',
+    value: 'elegant-luxury',
+  },
+  {
+    name: 'Midnight bloom',
+    value: 'midnight-bloom',
+  },
+  {
+    name: 'Modern minimal',
+    value: 'modern-minimal',
+  },
+  {
+    name: 'Nature',
+    value: 'nature',
+  },
+  {
+    name: 'Northern lights',
+    value: 'northern-lights',
+  },
+  {
+    name: 'Ocean breeze',
+    value: 'ocean-breeze',
+  },
+  {
+    name: 'Pastel dreams',
+    value: 'pastel-dreams',
+  },
+  {
+    name: 'Retro arcade',
+    value: 'retro-arcade',
   },
 ];
 
@@ -35,10 +71,6 @@ const SCALED_THEMES = [
   {
     name: 'Default',
     value: 'default-scaled',
-  },
-  {
-    name: 'Blue',
-    value: 'blue-scaled',
   },
 ];
 
@@ -57,7 +89,7 @@ export function ThemeSelector() {
       <Select value={activeTheme} onValueChange={setActiveTheme}>
         <SelectTrigger
           size="sm"
-          className="justify-start *:data-[slot=select-value]:w-12"
+          className="justify-start *:data-[slot=select-value]:w-28"
         >
           <span className="text-muted-foreground hidden sm:block">
             Select a theme:

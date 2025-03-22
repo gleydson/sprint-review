@@ -47,12 +47,6 @@ export async function signIn(_: FormState, formData: FormData) {
       };
     }
 
-    if (error instanceof Error) {
-      return {
-        message: error.message ?? 'An error occurred. Please try again.',
-      };
-    }
-
     return {
       message: 'An error occurred. Please try again.',
     };

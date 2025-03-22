@@ -1,8 +1,6 @@
 import { SiteHeader } from '@/components/site-header';
 import type { ReactNode } from 'react';
 
-import './theme.css';
-
 export default async function DashboardLayout({
   children,
 }: {
