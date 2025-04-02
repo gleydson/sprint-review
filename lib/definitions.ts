@@ -40,7 +40,15 @@ export type Board = {
   id: number;
   name: string;
   type: 'kanban' | 'scrum';
-  location: { projectId: number; projectKey: string };
+  location: {
+    avatarURI: string;
+    displayName: string;
+    name: string;
+    projectId: string;
+    projectKey: string;
+    projectName: string;
+    projectTypeKey: string;
+  };
 };
 
 export type Sprint = {
@@ -61,7 +69,7 @@ export type User = {
   displayName: string;
   emailAddress: string;
   key: string;
-  name: string;
+  name?: string;
   self: string;
   timeZone: string;
 };
@@ -155,4 +163,23 @@ export type Issue = {
   id: string;
   key: string;
   self: string;
+};
+
+export type ServerInfo = {
+  baseUrl: string;
+  buildDate: string;
+  buildNumber: number;
+  defaultLocale: {
+    locale: string;
+  };
+  deploymentType: string;
+  displayUrl: string;
+  displayUrlConfluence: string;
+  displayUrlServicedeskHelpCenter: string;
+  scmInfo: string;
+  serverTime: string;
+  serverTimeZone: string;
+  serverTitle: string;
+  version: string;
+  versionNumbers: [number, number, number];
 };

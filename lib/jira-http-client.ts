@@ -1,5 +1,18 @@
 import { cookies } from 'next/headers';
 
+export class JiraHttpClientError extends Error {
+  statusCode: number;
+
+  constructor({
+    message,
+    statusCode,
+  }: { message: string; statusCode: number }) {
+    super(message);
+    this.name = 'JiraHttpClientError';
+    this.statusCode = statusCode;
+  }
+}
+
 type HttpParams = Record<string, unknown>;
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 type HttpBody = Record<string, unknown>;
@@ -11,11 +24,62 @@ type Options = Omit<RequestInit, 'body' | 'method' | 'headers'> & {
   params?: HttpParams;
 };
 
-const BASE_URL = 'https://allstone.atlassian.net';
 const TRAILING_SLASH_REGEX = /\/$/;
 
-function resolveUrl(path: string, params?: HttpParams) {
-  const fullUrl = `${BASE_URL}/${path}`
+export async function jiraHttpClient<T>(url: string, options?: Options) {
+  const {
+    headers,
+    params,
+    body,
+    method = 'GET',
+    ...restOptions
+  } = options ?? {};
+
+  const resolvedUrl = await resolveUrl(url, params);
+  const resolvedHeaders = await resolveHeaders(headers);
+  const resolvedBody = resolveBody(body);
+  const response = await fetch(resolvedUrl, {
+    method,
+    headers: resolvedHeaders,
+    body: resolvedBody,
+    ...restOptions,
+  });
+
+  if (!response.ok) {
+    console.error({
+      status: response.status,
+      statusText: response.statusText,
+      url: resolvedUrl,
+    });
+    throw new JiraHttpClientError({
+      message: 'An error occurred while fetching data from Jira.',
+      statusCode: response.status,
+    });
+  }
+
+  const res = (await response.json()) as T;
+  return res;
+}
+
+async function resolveUrl(path: string, params?: HttpParams) {
+  const cookieStore = await cookies();
+  const jiraDomain = cookieStore.get('jira-domain')?.value;
+
+  if (!(jiraDomain || path.startsWith('https://'))) {
+    throw new Error('Jira domain is missing.');
+  }
+
+  let baseUrl = '';
+
+  if (path.startsWith('https://')) {
+    baseUrl = '';
+  } else if (jiraDomain) {
+    baseUrl = jiraDomain;
+  } else {
+    throw new Error('Jira domain is missing.');
+  }
+
+  const fullUrl = `${baseUrl}${path}`
     .replace(/([^:]\/)\/+/g, '$1')
     .replace(TRAILING_SLASH_REGEX, '');
 
@@ -34,12 +98,13 @@ function resolveUrl(path: string, params?: HttpParams) {
 
 async function resolveHeaders(headers?: HttpHeaders) {
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth-token');
-
-  const defaultHeaders = new Headers();
+  const defaultHeaders = new Headers(headers);
   defaultHeaders.set('Accept', 'application/json');
-  if (token) {
-    defaultHeaders.set('Authorization', `Basic ${token.value}`);
+
+  const authToken = cookieStore.get('auth-token')?.value;
+
+  if (authToken) {
+    defaultHeaders.set('Authorization', `Basic ${authToken}`);
   }
 
   const allHeaders = new Headers(defaultHeaders);
@@ -55,36 +120,4 @@ async function resolveHeaders(headers?: HttpHeaders) {
 
 function resolveBody(body?: HttpBody) {
   return body ? JSON.stringify(body) : undefined;
-}
-
-export async function jiraHttpClient<T>(url: string, options?: Options) {
-  const {
-    headers,
-    params,
-    body,
-    method = 'GET',
-    ...restOptions
-  } = options ?? {};
-
-  const resolvedUrl = resolveUrl(url, params);
-  const resolvedHeaders = await resolveHeaders(headers);
-  const resolvedBody = resolveBody(body);
-  const response = await fetch(resolvedUrl, {
-    method,
-    headers: resolvedHeaders,
-    body: resolvedBody,
-    ...restOptions,
-  });
-
-  if (!response.ok) {
-    console.error({
-      status: response.status,
-      statusText: response.statusText,
-      url: resolvedUrl,
-    });
-    throw new Error('Failed to fetch data');
-  }
-
-  const res = (await response.json()) as T;
-  return res;
 }

@@ -1,14 +1,16 @@
 'use server';
 
 import type { User } from '@/lib/definitions';
-import { jiraHttpClient } from '@/lib/jira-http-client';
+import { JiraHttpClientError, jiraHttpClient } from '@/lib/jira-http-client';
+import { strToBase64 } from '@/lib/utils';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const SignInFormSchema = z.object({
+  domain: z.string().url(),
   email: z.string().email(),
-  token: z.string(),
+  token: z.string().min(1),
 });
 
 type FormState = {
@@ -19,23 +21,32 @@ export async function signIn(_: FormState, formData: FormData) {
   const cookieStore = await cookies();
 
   try {
-    const { email, token } = SignInFormSchema.parse({
+    const { domain, email, token } = SignInFormSchema.parse({
+      domain: formData.get('domain'),
       email: formData.get('email'),
       token: formData.get('token'),
     });
 
     const credentials = `${email}:${token}`;
+    const authToken = strToBase64(credentials);
 
-    const authToken = Buffer.from(credentials).toString('base64');
-
-    await jiraHttpClient<User>('/rest/api/3/myself', {
+    const url = `${domain}/rest/api/3/myself`.replace(/([^:])\/\/+/g, '$1/');
+    await jiraHttpClient<User>(url, {
       headers: {
         Authorization: `Basic ${authToken}`,
       },
     });
 
+    cookieStore.set('jira-domain', domain, {
+      httpOnly: false,
+      sameSite: 'strict',
+    });
+    cookieStore.set('jira-email', email, {
+      httpOnly: false,
+      sameSite: 'strict',
+    });
     cookieStore.set('auth-token', authToken, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: 'strict',
     });
   } catch (error) {
@@ -47,8 +58,20 @@ export async function signIn(_: FormState, formData: FormData) {
       };
     }
 
+    if (error instanceof JiraHttpClientError) {
+      if (error.statusCode === 401) {
+        return {
+          message: 'Invalid credentials. Please try again.',
+        };
+      }
+
+      return {
+        message: 'An error occurred. Check your credentials and try again.',
+      };
+    }
+
     return {
-      message: 'An error occurred. Please try again.',
+      message: 'An error occurred. Check your credentials and try again.',
     };
   }
 
@@ -57,6 +80,8 @@ export async function signIn(_: FormState, formData: FormData) {
 
 export async function signOut() {
   const cookieStore = await cookies();
+  cookieStore.delete('jira-domain');
+  cookieStore.delete('jira-email');
   cookieStore.delete('auth-token');
   redirect('/sign-in');
 }

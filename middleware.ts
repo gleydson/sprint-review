@@ -11,25 +11,27 @@ const publicRoutes = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const publicRoute = publicRoutes.find(route => route.path === pathname);
+  const jiraDomain = request.cookies.get('jira-domain');
   const authToken = request.cookies.get('auth-token');
+  const isAuthenticated = !!(jiraDomain && authToken);
 
-  if (!authToken && publicRoute) {
+  if (!isAuthenticated && publicRoute) {
     return NextResponse.next();
   }
 
-  if (!(authToken || publicRoute)) {
+  if (!(isAuthenticated || publicRoute)) {
     return NextResponse.redirect(new URL('/sign-in', request.nextUrl));
   }
 
   if (
-    authToken &&
+    isAuthenticated &&
     publicRoute &&
     publicRoute.whenAuthenticated === 'redirect'
   ) {
     return NextResponse.redirect(new URL('/', request.nextUrl));
   }
 
-  if (authToken && !publicRoute) {
+  if (isAuthenticated && !publicRoute) {
     // validate the token
     // if the token is invalid, clear the cookie and redirect to sign-in
     return NextResponse.next();

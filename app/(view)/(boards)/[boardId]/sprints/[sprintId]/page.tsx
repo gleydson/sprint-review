@@ -15,14 +15,12 @@ import {
 } from '@/components/ui/card';
 import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
 
-export default async function Dashboard({
-  searchParams,
-}: {
-  searchParams: Promise<{
+export default async function Dashboard(props: {
+  params: Promise<{
     sprintId: string;
   }>;
 }) {
-  const { sprintId } = await searchParams;
+  const { sprintId } = await props.params;
 
   if (!sprintId) {
     return 'select a project, board and sprint to view charts';
@@ -124,7 +122,7 @@ export default async function Dashboard({
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <TotalsByStatus issues={paginatedIssued.issues} />
         <AddedVsPlanned issues={paginatedIssued.issues} sprint={sprint} />
         <AverageOpenTime issues={paginatedIssued.issues} sprint={sprint} />
