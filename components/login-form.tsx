@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { IconAlertCircle, IconCarouselVertical } from '@tabler/icons-react';
+import { IconAlertHexagon, IconCarouselVertical } from '@tabler/icons-react';
 import Link from 'next/link';
 import { type ComponentPropsWithoutRef, useActionState } from 'react';
+import { Alert, AlertDescription } from './ui/alert';
 
 export function LoginForm({
   className,
@@ -43,15 +44,34 @@ export function LoginForm({
                   type="url"
                   required
                   placeholder="https://company.atlassian.net"
+                  defaultValue={state?.inputs?.domain}
+                  aria-describedby={
+                    state?.errors?.domain ? 'domain-error' : 'domain-info'
+                  }
                 />
+
                 <datalist id="domain">
                   <option value="https://allstone.atlassian.net/" />
                 </datalist>
-                <p className="text-xs text-muted-foreground text-pretty">
-                  Your Atlassian domain, typically in the format
-                  https://company.atlassian.net
-                </p>
+
+                {state?.errors?.domain ? (
+                  <p
+                    id="domain-error"
+                    className="text-xs text-destructive text-pretty"
+                  >
+                    {state.errors.domain[0]}
+                  </p>
+                ) : (
+                  <p
+                    id="domain-info"
+                    className="text-xs text-muted-foreground text-pretty"
+                  >
+                    Your Atlassian domain, typically in the format
+                    https://company.atlassian.net
+                  </p>
+                )}
               </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -59,13 +79,30 @@ export function LoginForm({
                   name="email"
                   type="email"
                   autoComplete="email"
-                  required
+                  // required
                   placeholder="your.email@company.com"
+                  defaultValue={state?.inputs?.email}
+                  aria-describedby={
+                    state?.errors?.email ? 'email-error' : 'email-info'
+                  }
                 />
-                <p className="text-xs text-muted-foreground">
-                  The email address associated with your Atlassian account
-                </p>
+                {state?.errors?.email ? (
+                  <p
+                    id="email-error"
+                    className="text-xs text-destructive text-pretty"
+                  >
+                    {state.errors.email[0]}
+                  </p>
+                ) : (
+                  <p
+                    id="email-info"
+                    className="text-xs text-muted-foreground text-pretty"
+                  >
+                    The email address associated with your Atlassian account
+                  </p>
+                )}
               </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="token">Token</Label>
                 <Input
@@ -75,29 +112,42 @@ export function LoginForm({
                   autoComplete="current-password"
                   required
                   placeholder="••••••••••••••••••••••••••••••••"
+                  defaultValue={state?.inputs?.token}
+                  aria-describedby={
+                    state?.errors?.token ? 'token-error' : 'token-info'
+                  }
                 />
-                <p className="text-xs text-muted-foreground">
-                  Your Atlassian API token. You can create one in your{' '}
-                  <a
-                    href="https://id.atlassian.com/manage-profile/security/api-tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline underline-offset-2"
+                {state?.errors?.token ? (
+                  <p
+                    id="token-error"
+                    className="text-xs text-destructive text-pretty"
                   >
-                    Atlassian account settings
-                  </a>
-                </p>
+                    {state.errors.token[0]}
+                  </p>
+                ) : (
+                  <p
+                    id="token-info"
+                    className="text-xs text-muted-foreground text-pretty"
+                  >
+                    Your Atlassian API token. You can create one in your{' '}
+                    <a
+                      href="https://id.atlassian.com/manage-profile/security/api-tokens"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline underline-offset-2"
+                    >
+                      Atlassian account settings
+                    </a>
+                  </p>
+                )}
               </div>
 
-              {state?.message ? (
-                <output
-                  aria-live="polite"
-                  className="flex gap-2 items-center text-destructive text-pretty"
-                >
-                  <IconAlertCircle className="size-4" />
-                  <p>{state.message}</p>
-                </output>
-              ) : null}
+              {state?.message && (
+                <Alert variant="destructive">
+                  <IconAlertHexagon className="size-4" />
+                  <AlertDescription>{state.message}</AlertDescription>
+                </Alert>
+              )}
 
               <Button
                 aria-disabled={pending}

@@ -8,24 +8,45 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const SignInFormSchema = z.object({
-  domain: z.string().url(),
-  email: z.string().email(),
-  token: z.string().min(1),
+  domain: z.string().url('Invalid domain URL').min(1, 'Domain is required'),
+  email: z.string().email('Invalid email address'),
+  token: z.string().min(1, 'Token is required'),
 });
 
-type FormState = {
-  message?: string;
-} | null;
+type SignInFormInputs = z.infer<typeof SignInFormSchema>;
 
-export async function signIn(_: FormState, formData: FormData) {
+type SignInFormState = {
+  success: boolean;
+  message?: string;
+  errors?: z.inferFlattenedErrors<typeof SignInFormSchema>['fieldErrors'];
+  inputs?: SignInFormInputs;
+};
+
+export async function signIn(
+  _: SignInFormState | null,
+  formData: FormData,
+): Promise<SignInFormState> {
   const cookieStore = await cookies();
 
+  const rawData: SignInFormInputs = {
+    domain: formData.get('domain') as string,
+    email: formData.get('email') as string,
+    token: formData.get('token') as string,
+  };
+
   try {
-    const { domain, email, token } = SignInFormSchema.parse({
-      domain: formData.get('domain'),
-      email: formData.get('email'),
-      token: formData.get('token'),
-    });
+    const validatedData = SignInFormSchema.safeParse(rawData);
+
+    if (!validatedData.success) {
+      return {
+        success: false,
+        message: 'Invalid credentials. Fix the errors and try again.',
+        errors: validatedData.error.flatten().fieldErrors,
+        inputs: rawData,
+      };
+    }
+
+    const { domain, email, token } = validatedData.data;
 
     const credentials = `${email}:${token}`;
     const authToken = strToBase64(credentials);
@@ -52,25 +73,24 @@ export async function signIn(_: FormState, formData: FormData) {
   } catch (error) {
     console.error(error);
 
-    if (error instanceof z.ZodError) {
-      return {
-        message: 'Invalid credentials. Please try again.',
-      };
-    }
-
     if (error instanceof JiraHttpClientError) {
       if (error.statusCode === 401) {
         return {
-          message: 'Invalid credentials. Please try again.',
+          success: false,
+          message:
+            'Authentication failed. Check your credentials and try again.',
+          inputs: rawData,
         };
       }
 
       return {
+        success: false,
         message: 'An error occurred. Check your credentials and try again.',
       };
     }
 
     return {
+      success: false,
       message: 'An error occurred. Check your credentials and try again.',
     };
   }

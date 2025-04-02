@@ -92,6 +92,10 @@ function useGetBreadcrumb(): BreadcrumbItemType[] {
   if (sprint) {
     return [
       {
+        label: 'Boards',
+        path: '/',
+      },
+      {
         label: board?.name ?? '',
         path: `/${board?.id}`,
       },
