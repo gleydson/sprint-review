@@ -79,7 +79,7 @@ export function LoginForm({
                   name="email"
                   type="email"
                   autoComplete="email"
-                  // required
+                  required
                   placeholder="your.email@company.com"
                   defaultValue={state?.inputs?.email}
                   aria-describedby={
