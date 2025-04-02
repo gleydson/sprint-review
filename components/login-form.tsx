@@ -48,6 +48,7 @@ export function LoginForm({
                   aria-describedby={
                     state?.errors?.domain ? 'domain-error' : 'domain-info'
                   }
+                  aria-invalid={!!state?.errors?.domain}
                 />
 
                 <datalist id="domain">
@@ -58,6 +59,7 @@ export function LoginForm({
                   <p
                     id="domain-error"
                     className="text-xs text-destructive text-pretty"
+                    aria-live="polite"
                   >
                     {state.errors.domain[0]}
                   </p>
@@ -85,11 +87,13 @@ export function LoginForm({
                   aria-describedby={
                     state?.errors?.email ? 'email-error' : 'email-info'
                   }
+                  aria-invalid={!!state?.errors?.email}
                 />
                 {state?.errors?.email ? (
                   <p
                     id="email-error"
                     className="text-xs text-destructive text-pretty"
+                    aria-live="polite"
                   >
                     {state.errors.email[0]}
                   </p>
@@ -116,11 +120,13 @@ export function LoginForm({
                   aria-describedby={
                     state?.errors?.token ? 'token-error' : 'token-info'
                   }
+                  aria-invalid={!!state?.errors?.token}
                 />
                 {state?.errors?.token ? (
                   <p
                     id="token-error"
                     className="text-xs text-destructive text-pretty"
+                    aria-live="polite"
                   >
                     {state.errors.token[0]}
                   </p>
